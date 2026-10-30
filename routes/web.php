@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ConsultaController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::redirect('/', '/consultas');
+Route::resource('consultas', ConsultaController::class);
