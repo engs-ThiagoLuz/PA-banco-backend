@@ -40,7 +40,7 @@ class HospitalDatasetImporter
 
             foreach (self::TABLES as $table) {
                 if ($connection->table($table)->exists()) {
-                    throw new RuntimeException('Import requires empty hospital tables; '.$table.' contains data. Select a new DB_SCHEMA to preserve existing records.');
+                    throw new RuntimeException('Import requires empty hospital tables; public.'.$table.' contains data. Existing records were preserved.');
                 }
             }
 

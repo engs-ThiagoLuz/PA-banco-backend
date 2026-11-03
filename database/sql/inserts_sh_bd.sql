@@ -2,7 +2,7 @@
 -- SISTEMA DE HOSPITAL - INSERTS EM GRANDE VOLUME (PostgreSQL)
 -- Gerado automaticamente - dataset dimensionado para uso real de indices
 -- =====================================================================
-SET SEARCH_PATH TO Thiago_SistemaHospitalar_BD;
+SET SEARCH_PATH TO public;
 -- ESPECIALIDADES
 INSERT INTO especialidades (nome) VALUES
 ('Cardiologia'),

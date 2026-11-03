@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ConsultaFiltroRequest;
 use App\Http\Requests\ConsultaRequest;
 use App\Models\Consulta;
 use App\Models\Medico;
@@ -9,22 +10,23 @@ use App\Models\Paciente;
 use App\Services\ConsultaService;
 use DomainException;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ConsultaController extends Controller
 {
-    public function __construct(private ConsultaService $service)
-    {
-    }
+    public function __construct(private ConsultaService $service) {}
 
-    public function index(Request $request): View
+    public function index(ConsultaFiltroRequest $request): View
     {
-        $consultas = $this->service->listar($request->only(['busca', 'status']));
+        $filtros = $request->validated();
+        $consultas = $this->service->listar($filtros, (int) ($filtros['por_pagina'] ?? 10));
 
         return view('consultas.index', [
-            'consultas'  => $consultas,
+            'consultas' => $consultas,
             'statusList' => ConsultaService::STATUS,
+            'resumo' => $this->service->resumo(),
+            'medicos' => Medico::orderBy('nome')->get(['id', 'nome']),
+            'filtros' => $filtros,
         ]);
     }
 
@@ -81,8 +83,8 @@ class ConsultaController extends Controller
     private function dadosFormulario(): array
     {
         return [
-            'pacientes'  => Paciente::orderBy('nome')->get(['id', 'nome']),
-            'medicos'    => Medico::with('especialidade:id,nome')->orderBy('nome')->get(['id', 'nome', 'especialidade_id']),
+            'pacientes' => Paciente::orderBy('nome')->get(['id', 'nome']),
+            'medicos' => Medico::with('especialidade:id,nome')->orderBy('nome')->get(['id', 'nome', 'especialidade_id']),
             'statusList' => ConsultaService::STATUS,
         ];
     }

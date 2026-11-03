@@ -39,8 +39,8 @@ class HospitalDatasetImportTest extends TestCase
         $this->get(route('consultas.show', $consulta))->assertOk()
             ->assertSee($consulta->paciente->nome)
             ->assertSee($consulta->prescricoes->first()->itens->first()->medicamento->nome);
-        $this->getJson('/api/consultas?busca=João')->assertOk()
-            ->assertJsonPath('data.0.paciente.nome', fn (string $nome): bool => str_contains($nome, 'João'));
+        $this->getJson('/api/consultas?busca=100.000.000-00')->assertOk()
+            ->assertJsonPath('data.0.paciente.nome', 'João Santos Castro');
 
         $this->seed(DatabaseSeeder::class);
 
@@ -58,7 +58,7 @@ class HospitalDatasetImportTest extends TestCase
             app(HospitalDatasetImporter::class)->import(database_path('sql/inserts_sh_bd.sql'));
             $this->fail('Import should refuse populated hospital tables.');
         } catch (RuntimeException $exception) {
-            $this->assertStringContainsString('requer table vazia de hospital', $exception->getMessage());
+            $this->assertStringContainsString('Import requires empty hospital tables', $exception->getMessage());
         }
 
         $this->assertModelExists($especialidade);

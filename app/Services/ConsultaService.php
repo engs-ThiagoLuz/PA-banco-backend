@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Consulta;
 use DomainException;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 
 class ConsultaService
@@ -13,15 +14,36 @@ class ConsultaService
 
     public function listar(array $filtros = [], int $porPagina = 10): LengthAwarePaginator
     {
-        return Consulta::with(['paciente', 'medico.especialidade'])
+        return Consulta::with(['paciente.convenio', 'medico.especialidade'])
+            ->withCount(['prontuarios', 'prescricoes'])
             ->when($filtros['status'] ?? null, fn ($q, $status) => $q->where('status', $status))
+            ->when($filtros['medico_id'] ?? null, fn ($q, $medicoId) => $q->where('medico_id', $medicoId))
+            ->when($filtros['data_inicio'] ?? null, fn ($q, $data) => $q->where('data_hora', '>=', $data.' 00:00:00'))
+            ->when($filtros['data_fim'] ?? null, fn ($q, $data) => $q->where('data_hora', '<', Carbon::parse($data)->addDay()->startOfDay()))
             ->when($filtros['busca'] ?? null, function ($q, $busca) {
-                $q->whereHas('paciente', fn ($p) => $p->where('nome', 'ilike', "%{$busca}%"));
+                $q->where(function ($query) use ($busca) {
+                    $query->whereHas('paciente', fn ($p) => $p->where(function ($paciente) use ($busca) {
+                        $paciente->where('nome', 'ilike', "%{$busca}%")->orWhere('cpf', 'ilike', "%{$busca}%");
+                    }))->orWhereHas('medico', fn ($medico) => $medico->where('nome', 'ilike', "%{$busca}%"));
+                });
             })
             ->orderByDesc('data_hora')
             ->orderByDesc('id')
             ->paginate($porPagina)
             ->withQueryString();
+    }
+
+    /** @return array{total: int, agendadas: int, realizadas: int, canceladas: int} */
+    public function resumo(): array
+    {
+        $totais = Consulta::query()->selectRaw('status, COUNT(*) AS total')->groupBy('status')->pluck('total', 'status');
+
+        return [
+            'total' => (int) $totais->sum(),
+            'agendadas' => (int) ($totais['Agendada'] ?? 0),
+            'realizadas' => (int) ($totais['Realizada'] ?? 0),
+            'canceladas' => (int) ($totais['Cancelada'] ?? 0),
+        ];
     }
 
     public function criar(array $dados): Consulta

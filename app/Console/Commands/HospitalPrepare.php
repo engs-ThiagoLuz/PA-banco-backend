@@ -12,7 +12,7 @@ class HospitalPrepare extends Command
 
     protected $signature = 'hospital:prepare {--force : Run in production without a prompt}';
 
-    protected $description = 'Create the configured PostgreSQL schema, migrate, and import the hospital dataset';
+    protected $description = 'Run migrations and import the hospital dataset into the public schema';
 
     public function handle(): int
     {
@@ -21,11 +21,8 @@ class HospitalPrepare extends Command
         }
 
         $connection = DB::connection();
-        $schema = $connection->getConfig('search_path');
-
-        if ($connection->getDriverName() !== 'pgsql' || ! is_string($schema)
-            || ! preg_match('/^[a-z_][a-z0-9_]*$/', $schema)) {
-            $this->error('Use PostgreSQL e set DB_SCHEMA to para um schema lowercase');
+        if ($connection->getDriverName() !== 'pgsql') {
+            $this->error('Use PostgreSQL para importar os dados no schema public.');
 
             return self::FAILURE;
         }
@@ -35,8 +32,6 @@ class HospitalPrepare extends Command
 
             return self::FAILURE;
         }
-
-        $connection->statement('CREATE SCHEMA IF NOT EXISTS "'.$schema.'"');
 
         return $this->call('migrate', ['--seed' => true, '--force' => true]);
     }
