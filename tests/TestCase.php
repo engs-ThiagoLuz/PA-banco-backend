@@ -8,9 +8,7 @@ use RuntimeException;
 abstract class TestCase extends BaseTestCase
 {
     /**
-     * Trava de segurança: o RefreshDatabase executa "migrate:fresh", que apaga TODAS
-     * as tabelas. Esta verificação roda ANTES disso e impede que os testes toquem
-     * o banco principal (o banco de testes deve ter "test" no nome, ex.: hospital_teste).
+        * Testes feitos em um banco de testes separado
      */
     protected function refreshApplication(): void
     {
