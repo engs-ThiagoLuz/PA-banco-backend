@@ -28,6 +28,7 @@ class HospitalDatasetImportTest extends TestCase
         $this->assertDatabaseCount('pacientes', 4000);
         $this->assertDatabaseCount('quartos', 111);
         $this->assertDatabaseCount('consultas', 40000);
+        $this->assertDatabaseCount('consultas_status_log', 0);
         $this->assertDatabaseCount('prontuarios', 23984);
         $this->assertDatabaseCount('internacoes', 4000);
         $this->assertDatabaseCount('prescricoes', 15000);
@@ -47,7 +48,9 @@ class HospitalDatasetImportTest extends TestCase
         $this->assertDatabaseCount('consultas', 40000);
         $this->assertDatabaseCount('hospital_dataset_imports', 1);
         $this->assertSame(16, Especialidade::create(['nome' => 'Nova especialidade'])->id);
-        $this->assertSame(40001, Consulta::factory()->create()->id);
+        $novaConsulta = Consulta::factory()->agendada()->create();
+        $this->assertSame(40001, $novaConsulta->id);
+        $this->assertDatabaseHas('consultas_status_log', ['consulta_id' => $novaConsulta->id, 'status_novo' => 'Agendada']);
     }
 
     public function test_import_refuses_existing_records_without_changing_them(): void

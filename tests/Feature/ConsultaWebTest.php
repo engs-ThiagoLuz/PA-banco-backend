@@ -65,7 +65,7 @@ class ConsultaWebTest extends TestCase
         $paciente = Paciente::factory()->create();
         $medico = Medico::factory()->create();
         $consultas = Consulta::factory()->count(11)->create([
-            'paciente_id' => $paciente->id, 'medico_id' => $medico->id,
+            'paciente_id' => $paciente->id,
             'data_hora' => '2026-11-03 09:00:00', 'status' => 'Agendada',
         ]);
 

@@ -4,8 +4,11 @@ namespace App\Services;
 
 use App\Models\Consulta;
 use DomainException;
+use Illuminate\Database\QueryException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class ConsultaService
@@ -78,6 +81,39 @@ class ConsultaService
         }
 
         $consulta->delete();
+    }
+
+    public function cancelar(Consulta $consulta, ?string $motivo = null): Consulta
+    {
+        return $this->executarAcao($consulta, 'CALL sp_cancelar_consulta(?, ?)', [$consulta->id, $motivo]);
+    }
+
+    public function realizar(Consulta $consulta, string $descricao, ?string $diagnostico = null): Consulta
+    {
+        return $this->executarAcao($consulta, 'CALL sp_realizar_consulta(?, ?, ?)', [$consulta->id, $descricao, $diagnostico]);
+    }
+
+    public function historico(Consulta $consulta): Collection
+    {
+        return DB::table('consultas_status_log')->where('consulta_id', $consulta->id)
+            ->orderByDesc('alterado_em')->orderByDesc('id')->get();
+    }
+
+    private function executarAcao(Consulta $consulta, string $sql, array $parametros): Consulta
+    {
+        try {
+            DB::transaction(fn () => DB::statement($sql, $parametros));
+        } catch (QueryException $exception) {
+            if (($exception->errorInfo[0] ?? null) !== 'P0001') {
+                throw $exception;
+            }
+
+            throw ValidationException::withMessages([
+                'status' => 'A ação não pôde ser concluída. Somente consultas agendadas podem ser canceladas ou realizadas.',
+            ]);
+        }
+
+        return $consulta->refresh();
     }
 
     /**

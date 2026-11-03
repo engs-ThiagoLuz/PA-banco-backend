@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ConsultaAcaoRequest;
 use App\Http\Requests\ConsultaRequest;
 use App\Http\Resources\ConsultaResource;
 use App\Models\Consulta;
@@ -15,9 +16,7 @@ use Illuminate\Http\Response;
 
 class ConsultaApiController extends Controller
 {
-    public function __construct(private ConsultaService $service)
-    {
-    }
+    public function __construct(private ConsultaService $service) {}
 
     public function index(Request $request): AnonymousResourceCollection
     {
@@ -58,5 +57,17 @@ class ConsultaApiController extends Controller
         }
 
         return response()->noContent();
+    }
+
+    public function cancelar(ConsultaAcaoRequest $request, Consulta $consulta): ConsultaResource
+    {
+        return new ConsultaResource($this->service->cancelar($consulta, $request->validated('motivo'))
+            ->load(['paciente', 'medico.especialidade']));
+    }
+
+    public function realizar(ConsultaAcaoRequest $request, Consulta $consulta): ConsultaResource
+    {
+        return new ConsultaResource($this->service->realizar($consulta, $request->validated('descricao'), $request->validated('diagnostico'))
+            ->load(['paciente', 'medico.especialidade']));
     }
 }

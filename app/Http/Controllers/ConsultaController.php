@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ConsultaAcaoRequest;
 use App\Http\Requests\ConsultaFiltroRequest;
 use App\Http\Requests\ConsultaRequest;
 use App\Models\Consulta;
@@ -52,7 +53,21 @@ class ConsultaController extends Controller
             'prescricoes.itens.medicamento',
         ]);
 
-        return view('consultas.show', compact('consulta'));
+        return view('consultas.show', ['consulta' => $consulta, 'historico' => $this->service->historico($consulta)]);
+    }
+
+    public function cancelar(ConsultaAcaoRequest $request, Consulta $consulta): RedirectResponse
+    {
+        $this->service->cancelar($consulta, $request->validated('motivo'));
+
+        return redirect()->route('consultas.show', $consulta)->with('sucesso', 'Consulta cancelada com sucesso.');
+    }
+
+    public function realizar(ConsultaAcaoRequest $request, Consulta $consulta): RedirectResponse
+    {
+        $this->service->realizar($consulta, $request->validated('descricao'), $request->validated('diagnostico'));
+
+        return redirect()->route('consultas.show', $consulta)->with('sucesso', 'Consulta realizada e prontuário registrado.');
     }
 
     public function edit(Consulta $consulta): View

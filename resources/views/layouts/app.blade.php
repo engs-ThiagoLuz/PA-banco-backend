@@ -97,7 +97,8 @@
 <body>
     <header>
         <a class="marca" href="{{ route('consultas.index') }}"><span class="marca-icone" aria-hidden="true">+</span>Sistema Hospitalar</a>
-        <a class="nav-atual" href="{{ route('consultas.index') }}" aria-current="page">Consultas</a>
+        <a class="nav-atual" href="{{ route('consultas.index') }}" @if(request()->routeIs('consultas.*')) aria-current="page" @endif>Consultas</a>
+        <a href="{{ route('relatorios.index') }}" @if(request()->routeIs('relatorios.*')) aria-current="page" @endif>Relatórios</a>
     </header>
 
     <main>

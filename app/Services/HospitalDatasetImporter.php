@@ -54,9 +54,13 @@ class HospitalDatasetImporter
                 $connection->statement('ALTER SEQUENCE '.$connection->getQueryGrammar()->wrapTable($sequence).' RESTART WITH 1');
             }
 
+            $connection->statement('ALTER TABLE consultas DISABLE TRIGGER USER');
+
             foreach ($this->insertStatements($path) as $statement) {
                 $connection->unprepared($statement);
             }
+
+            $connection->statement('ALTER TABLE consultas ENABLE TRIGGER USER');
 
             $connection->table('hospital_dataset_imports')->insert([
                 'checksum' => $checksum,
