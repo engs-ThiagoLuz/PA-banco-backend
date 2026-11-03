@@ -19,6 +19,7 @@ class ConsultaService
                 $q->whereHas('paciente', fn ($p) => $p->where('nome', 'ilike', "%{$busca}%"));
             })
             ->orderByDesc('data_hora')
+            ->orderByDesc('id')
             ->paginate($porPagina)
             ->withQueryString();
     }
