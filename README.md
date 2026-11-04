@@ -197,12 +197,21 @@ php artisan test --compact tests/Feature/ConsultaApiTest.php
 
 ## Organização
 |         Caminho         |                       Responsabilidade                    |
+
 | `app/Models/`           | Entidades e relacionamentos Eloquent.                     |
+
 | `app/Http/Controllers/` | Controllers web e API.                                    |
+
 | `app/Http/Requests/`    | Validação das requisições.                                |
+
 | `app/Http/Resources/`   | Representação JSON das consultas.                         |
+
 | `app/Services/`         | Regras de consultas e importação da carga SQL.            |
+
 | `resources/views/`      | Telas Blade.                                              |
+
 | `database/migrations/`  | Estrutura e instalação dos objetos PostgreSQL.            |
+
 | `database/sql/`         | Carga inicial, objetos do banco e procedimento de backup. |
+
 | `tests/Feature/`        | Testes de integração web, API e banco.                    |
