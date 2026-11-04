@@ -52,15 +52,25 @@ Abra no navegador o endereço informado por `php artisan serve`. A rota `/` redi
 ## Rotas web
 
 |   Método  |          Rota          |                      Finalidade                          |
+
 |   GET     | `/consultas`           | Agenda, busca e filtros.                                 |
+
 |   GET     | `/consultas/create`    | Formulário de cadastro.                                  |
+
 |   POST    | `/consultas`           | Cadastrar consulta.                                      |
+
 |   GET     | `/consultas/{id}`      | Detalhes, prontuários, prescrições e histórico de status.|
+
 |   GET     | `/consultas/{id}/edit` | Formulário de edição.                                    |
+
 | PUT/PATCH | `/consultas/{id}`      | Atualizar consulta.                                      |
+
 |  DELETE   | `/consultas/{id}`      | Excluir consulta sem prontuários ou prescrições.         |
+
 |   POST    | `/consultas/{id}/cancelar` | Cancelar uma consulta agendada via procedure.        |
+
 |POST| `/consultas/{id}/realizar`    | Realizar uma consulta agendada e registrar prontuário via procedure |
+
 |    GET    | `/relatorios`          | Faturamento e ocupação, com filtros.                     |
 
 ## API REST e API Resource
@@ -68,14 +78,23 @@ Abra no navegador o endereço informado por `php artisan serve`. A rota `/` redi
 As rotas estão em [routes/api.php](routes/api.php). O [ConsultaApiController](app/Http/Controllers/Api/ConsultaApiController.php) utiliza o [ConsultaService](app/Services/ConsultaService.php), e o [ConsultaResource](app/Http/Resources/ConsultaResource.php) define a representação JSON das consultas, incluindo paciente e médico.
 
 |   Método  |             Rota               |                      Resposta                      |
+
 |    GET    | `/api/consultas`               | `200`: JSON paginado com `data`, `links` e `meta`. |
+
 |    GET    | `/api/consultas/{id}`          | `200`: consulta em `data`.                         |
+
 |    POST   | `/api/consultas`               | `201`: consulta criada em `data`.                  |
+
 | PUT/PATCH | `/api/consultas/{id}`          | `200`: consulta atualizada em `data`.              |
+
 |   DELETE  | `/api/consultas/{id}`          | `204`: exclusão concluída, sem corpo.              |
+
 |    POST   | `/api/consultas/{id}/cancelar` | `200`: consulta cancelada em `data`.               |
+
 |    POST   | `/api/consultas/{id}/realizar` | `200`: consulta realizada em `data`.               |
+
 |    GET    | `/api/relatorios/faturamento`  | `200`: faturamento por médico em `data`.           |
+
 |    GET    | `/api/relatorios/ocupacao`     | `200`: ocupação dos quartos em `data`.             |
 
 Registros inexistentes retornam `404`; erros de validação retornam `422`. A tentativa de excluir consulta vinculada a prontuário ou prescrição retorna `409` com mensagem JSON. O código `204` não contém JSON porque significa sucesso sem conteúdo.
